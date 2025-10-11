@@ -51,6 +51,10 @@
     .buttons button:hover {
       background-color: #d6d6d6;
     }
+    .buttons button.active,
+    .buttons button:active {
+      background-color: #ccc;
+    }
     .operator {
       background-color: #f9a825;
       color: white;
@@ -79,29 +83,30 @@
   <div class="calculator">
     <div class="display" id="display">0</div>
     <div class="buttons">
-      <button class="clear" onclick="clearDisplay()">C</button>
-      <button onclick="appendValue('(')">(</button>
-      <button onclick="appendValue(')')">)</button>
-      <button class="operator" onclick="appendValue('/')">÷</button>
+      <button class="clear" onclick="clearDisplay()" data-key="c">C</button>
+      <button onclick="appendValue('(')" data-key="(">(</button>
+      <button onclick="appendValue(')')" data-key=")">)</button>
+      <button class="operator" onclick="appendValue('/')" data-key="/">÷</button>
 
-      <button onclick="appendValue('7')">7</button>
-      <button onclick="appendValue('8')">8</button>
-      <button onclick="appendValue('9')">9</button>
-      <button class="operator" onclick="appendValue('*')">×</button>
+      <button onclick="appendValue('7')" data-key="7">7</button>
+      <button onclick="appendValue('8')" data-key="8">8</button>
+      <button onclick="appendValue('9')" data-key="9">9</button>
+      <button class="operator" onclick="appendValue('*')" data-key="*">×</button>
 
-      <button onclick="appendValue('4')">4</button>
-      <button onclick="appendValue('5')">5</button>
-      <button onclick="appendValue('6')">6</button>
-      <button class="operator" onclick="appendValue('-')">−</button>
+      <button onclick="appendValue('4')" data-key="4">4</button>
+      <button onclick="appendValue('5')" data-key="5">5</button>
+      <button onclick="appendValue('6')" data-key="6">6</button>
+      <button class="operator" onclick="appendValue('-')" data-key="-">−</button>
 
-      <button onclick="appendValue('1')">1</button>
-      <button onclick="appendValue('2')">2</button>
-      <button onclick="appendValue('3')">3</button>
-      <button class="operator" onclick="appendValue('+')">+</button>
+      <button onclick="appendValue('1')" data-key="1">1</button>
+      <button onclick="appendValue('2')" data-key="2">2</button>
+      <button onclick="appendValue('3')" data-key="3">3</button>
+      <button class="operator" onclick="appendValue('+')" data-key="+">+</button>
 
-      <button onclick="appendValue('0')">0</button>
-      <button onclick="appendValue('.')">.</button>
-      <button class="equal" onclick="calculateResult()">=</button>
+      <button onclick="appendValue('0')" data-key="0">0</button>
+      <button onclick="appendValue('.')" data-key=".">.</button>
+      <button onclick="backspace()" data-key="Backspace">&larr;</button>
+      <button class="equal" onclick="calculateResult()" data-key="=">=</button>
     </div>
   </div>
 
@@ -120,6 +125,14 @@
       display.innerText = '0';
     }
 
+    function backspace() {
+      if (display.innerText.length > 1) {
+        display.innerText = display.innerText.slice(0, -1);
+      } else {
+        display.innerText = '0';
+      }
+    }
+
     function calculateResult() {
       try {
         display.innerText = eval(display.innerText);
@@ -127,6 +140,41 @@
         display.innerText = 'Error';
       }
     }
+
+    document.addEventListener('keydown', (event) => {
+      const key = event.key;
+      let button;
+      if (key === 'Backspace') {
+        button = document.querySelector(`button[data-key="Backspace"]`);
+      } else {
+        button = document.querySelector(`button[data-key="${key.toLowerCase()}"]`);
+      }
+
+      if (button) {
+        button.classList.add('active');
+        setTimeout(() => {
+          button.classList.remove('active');
+        }, 100);
+      }
+
+      if (key >= '0' && key <= '9' || key === '.') {
+        appendValue(key);
+      } else if (key === '+' || key === '-') {
+        appendValue(key);
+      } else if (key === '*') {
+        appendValue('*');
+      } else if (key === '/') {
+        appendValue('/');
+      } else if (key === 'Enter' || key === '=') {
+        calculateResult();
+      } else if (key === 'Backspace') {
+        backspace();
+      } else if (key === 'Escape' || key.toLowerCase() === 'c') {
+        clearDisplay();
+      } else if (key === '(' || key === ')') {
+        appendValue(key);
+      }
+    });
   </script>
 
 </body>
